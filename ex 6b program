@@ -1,0 +1,101 @@
+client:
+package com.mycompany.mavenproject2;
+
+import java.io.*;
+import java.net.*;
+
+public class client1
+{
+    public static void main(String args[])
+    {
+        try
+        {
+            DatagramSocket client = new DatagramSocket();
+            InetAddress addr = InetAddress.getByName("127.0.0.1");
+
+            byte[] sendByte = new byte[1024];
+            byte[] receiveByte = new byte[1024];
+
+            BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+
+            System.out.println("Enter the Physical Address (MAC): ");
+            String str = in.readLine();
+
+            sendByte = str.getBytes();
+
+            DatagramPacket sender = new DatagramPacket(sendByte, sendByte.length, addr, 1309);
+            client.send(sender);
+
+            DatagramPacket receiver = new DatagramPacket(receiveByte, receiveByte.length);
+            client.receive(receiver);
+
+            String s = new String(receiver.getData()).trim();
+
+            System.out.println("The Logical Address (IP) is: " + s);
+
+            client.close();
+        }
+        catch(Exception e)
+        {
+            System.out.println(e);
+        }
+    }
+}
+
+server:
+
+package com.mycompany.mavenproject2;
+
+import java.io.*;
+import java.net.*;
+
+public class server1
+{
+    public static void main(String args[])
+    {
+        try
+        {
+            DatagramSocket server = new DatagramSocket(1309);
+            System.out.println("RARP Server Started...");
+
+            while(true)
+            {
+                byte[] sendByte = new byte[1024];
+                byte[] receiveByte = new byte[1024];
+
+                DatagramPacket receiver = new DatagramPacket(receiveByte, receiveByte.length);
+                server.receive(receiver);
+
+                String str = new String(receiver.getData()).trim();
+
+                InetAddress addr = receiver.getAddress();
+                int port = receiver.getPort();
+
+                String ip[] = {"10.0.3.186"};
+                String mac[] = {"D4:3D:7E:12:A3:D9"};
+
+                for(int i=0;i<ip.length;i++)
+                {
+                    if(str.equals(mac[i]))
+                    {
+                        sendByte = ip[i].getBytes();
+
+                        DatagramPacket sender =
+                        new DatagramPacket(sendByte, sendByte.length, addr, port);
+
+                        server.send(sender);
+                        break;
+                    }
+                }
+
+                break;
+            }
+
+            server.close();
+        }
+        catch(Exception e)
+        {
+            System.out.println(e);
+        }
+    }
+}
