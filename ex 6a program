@@ -1,0 +1,83 @@
+clinet:
+
+package com.mycompany.mavenproject2;
+
+import java.io.*;
+import java.net.*;
+
+public class client
+{
+    public static void main(String args[])
+    {
+        try
+        {
+            BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+
+            Socket clsct = new Socket("127.0.0.1",5000);
+
+            BufferedReader din = new BufferedReader(new InputStreamReader(clsct.getInputStream()));
+            DataOutputStream dout = new DataOutputStream(clsct.getOutputStream());
+
+            System.out.println("Enter the Logical Address (IP): ");
+            String str1 = in.readLine();
+
+            dout.writeBytes(str1 + "\n");
+
+            String str = din.readLine();
+
+            System.out.println("The Physical Address is: " + str);
+
+            clsct.close();
+        }
+        catch(Exception e)
+        {
+            System.out.println(e);
+        }
+    }
+}
+
+
+server:
+
+package com.mycompany.mavenproject2;
+
+import java.io.*;
+import java.net.*;
+
+public class server
+{
+    public static void main(String args[])
+    {
+        try
+        {
+            ServerSocket obj = new ServerSocket(5000);
+            System.out.println("Server Started...");
+
+            Socket obj1 = obj.accept();
+
+            BufferedReader din = new BufferedReader(new InputStreamReader(obj1.getInputStream()));
+            DataOutputStream dout = new DataOutputStream(obj1.getOutputStream());
+
+            String str = din.readLine();
+
+            String ip[] = {"165.165.80.80","165.165.79.1"};
+            String mac[] = {"6A:08:AA:C2","8A:BC:E3:FA"};
+
+            for(int i=0;i<ip.length;i++)
+            {
+                if(str.equals(ip[i]))
+                {
+                    dout.writeBytes(mac[i] + "\n");
+                    break;
+                }
+            }
+
+            obj1.close();
+            obj.close();
+        }
+        catch(Exception e)
+        {
+            System.out.println(e);
+        }
+    }
+}
